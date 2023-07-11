@@ -30,13 +30,15 @@ export const createRepo = new Command('create-repo')
 		const author = await getGitHubUser();
 
 		const app: AppInfo = {
-			name: await prompt.input({ message: 'name:', validate: validateName }),
-			description: await prompt.input({ message: 'description:' }),
-			version: await prompt.input({
-				message: 'version:',
-				default: '0.0.0',
-				validate: validateSemVer,
-			}),
+			name: 'something-new' || (await prompt.input({ message: 'name:', validate: validateName })),
+			description: 'whoei' || (await prompt.input({ message: 'description:' })),
+			version:
+				'0.0.0' ||
+				(await prompt.input({
+					message: 'version:',
+					default: '0.0.0',
+					validate: validateSemVer,
+				})),
 		};
 
 		const replacers = getReplacers({ app, author });
@@ -47,6 +49,10 @@ export const createRepo = new Command('create-repo')
 		raise(!fs.existsSync(dest), `Directory "${app.name}" already exists, cowardly refusing to overwrite it`);
 
 		const $$ = $({ cwd: dest });
+
+		await fetchAndExtract(url, dest, replacers);
+
+		return;
 
 		const tasks = new Listr([
 			{

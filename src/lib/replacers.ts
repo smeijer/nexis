@@ -6,22 +6,21 @@ export type AppInfo = {
 	version: string;
 };
 
-export function getReplacers({ app, author }: { app: AppInfo; author: GitHubUser }): [string, string][] {
-	const replacerMap = {
-		name: app.name.toLowerCase().replace(/\s/g, '-'),
-		version: app.version,
-		description: app.description,
-		author: `${author.name} <${author.email}> (${author.blog})`,
-		'author.name': author.name,
-		'author.email': author.email,
-		'author.homepage': author.blog,
-		repository: `${author.login}/${app.name}`,
-		funding_url: `https://github.com/${author.login}/${app.name}?sponsor=1`,
-		issues_url: `https://github.com/${author.login}/${app.name}/issues`,
-		homepage_url: `https://github.com/${author.login}/${app.name}#readme`,
-	};
-
-	return Object.entries(replacerMap)
-		.filter(([_key, value]) => value)
-		.map(([key, value]) => [`{{ ${key.toUpperCase()}}`, String(value)]);
+export function getReplacers({ app, author }: { app: AppInfo; author: GitHubUser }) {
+	return {
+		NAME: app.name,
+		VERSION: app.version,
+		DESCRIPTION: app.description,
+		APP_NAME: app.name,
+		APP_VERSION: app.version,
+		APP_DESCRIPTION: app.description,
+		AUTHOR: `${author.name} <${author.email}> (${author.homepage})`,
+		AUTHOR_NAME: author.name,
+		AUTHOR_EMAIL: author.email,
+		AUTHOR_HOMEPAGE: author.homepage,
+		REPOSITORY: `${author.login}/${app.name}`,
+		FUNDING_URL: `https://github.com/${author.login}/${app.name}?sponsor=1`,
+		ISSUES_URL: `https://github.com/${author.login}/${app.name}/issues`,
+		HOMEPAGE_URL: `https://github.com/${author.login}/${app.name}#readme`,
+	} as const;
 }

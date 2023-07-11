@@ -1,16 +1,13 @@
-import Debug from 'debug';
 import fsp from 'fs/promises';
 import replacestream from 'replacestream';
-import { PassThrough, Readable } from 'stream';
+import { Readable } from 'stream';
 import { finished } from 'stream/promises';
 import { ReadableStream } from 'stream/web';
-import tar from 'tar';
+import tar, { ReadEntry } from 'tar';
 
 import { raise } from './raise.js';
 
-const debug = Debug('nexis');
-
-export async function fetchAndExtract(url: string, extractPath: string, replacers?: [string | RegExp, string][]) {
+export async function fetchAndExtract(url: string, extractPath: string, replacers?: Record<string, string>) {
 	const response = await fetch(url);
 
 	raise(response.ok, `Failed to fetch the archive: ${response.status} ${response.statusText}`);
@@ -20,20 +17,9 @@ export async function fetchAndExtract(url: string, extractPath: string, replacer
 	const extract = tar.extract({
 		cwd: extractPath,
 		strip: 1,
-		filter() {
-			return true;
-		},
 		transform(entry) {
-			const pipeline = (replacers || []).reduce(
-				(stream, [key, value]) => stream.pipe(replacestream(key, value) as PassThrough),
-				new PassThrough(),
-			);
-
-			return entry.pipe(pipeline);
-		},
-		onentry(entry) {
-			const filepath = entry.path.replace(/\//g, '/').split('/').slice(1).join('/');
-			debug(`extracting ${filepath}`);
+			if (!replacers || !Object.keys(replacers).length) return entry;
+			return entry.pipe(replacestream(/__([A-Z_]*)__/g, (_match, key) => replacers[key] || '')) as ReadEntry;
 		},
 	});
 

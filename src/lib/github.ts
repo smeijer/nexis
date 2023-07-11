@@ -2,7 +2,7 @@ import { raise } from './raise.js';
 
 export type GitHubUser = {
 	login: string;
-	blog: string;
+	homepage: string;
 	name: string;
 	email: string;
 };
@@ -16,9 +16,9 @@ export async function getGitHubUser(): Promise<GitHubUser> {
 		},
 	})
 		.then((x) => x.json())
-		.then((user: GitHubUser) => ({
+		.then((user: GitHubUser & { blog?: string }) => ({
 			login: String(user.login),
-			blog: String(user.blog ?? ''),
+			homepage: String(user.blog ?? ''),
 			name: String(user.name),
 			email: String(user.email),
 		}));
