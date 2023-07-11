@@ -94,5 +94,11 @@ export const createRepo = new Command('create-repo')
 			},
 		]);
 
-		tasks.run().catch((e: Error) => raise(e.message));
+		tasks
+			.run()
+			.then(() => {
+				// eslint-disable-next-line no-console
+				console.log(`\nDone! Your project is waiting at ./${app.name}`);
+			})
+			.catch((e: Error) => raise(e.message));
 	});

@@ -1,10 +1,13 @@
 import { Command } from '@commander-js/extra-typings';
 import fs from 'fs';
+import path from 'path';
 import { PackageJson } from 'type-fest';
+import { fileURLToPath } from 'url';
 
 import { createRepo } from './commands/create-repo.js';
 
-const pkg = JSON.parse(fs.readFileSync('../package.json', 'utf8')) as PackageJson;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')) as PackageJson;
 
 const program = new Command('nexis')
 	.description(pkg.description || '')
